@@ -37,6 +37,7 @@ object WallService{
 
     fun clear() {
         posts = emptyArray()
+        counter = 1
     }
 }
 
