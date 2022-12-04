@@ -28,4 +28,20 @@ internal class WallServiceTest {
         result = WallService.update(post2)
         assertEquals(false, result)
     }
+
+    @Test
+    fun createComment() {
+        val post1 = Post(1, 23)
+        val comment1 : Comment = Comment(12, text = "Nice post")
+        WallService.add(post1)
+
+        var result = WallService.createComment(1, comment1)
+        assertEquals(true, result)
+    }
+
+    @Test(expected = PostNotFoundException::class)
+    fun shouldThrow() {
+        val comment1 : Comment = Comment(12, text = "Nice post")
+        WallService.createComment(5,comment1)
+    }
 }
