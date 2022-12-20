@@ -1,3 +1,5 @@
+import javax.swing.UIManager.put
+
 class PostNotFoundException(message: String) : RuntimeException(message)
 
 data class Post (var id: Int,
@@ -15,6 +17,15 @@ data class Post (var id: Int,
 interface Attachment{
     val type: String
 }
+
+data class Note(
+    var id: Int = 0,
+    var title: String,
+    var text: String,
+    var privacy: Int,
+    var comment_privacy: Int,
+    var comments: MutableList<Comment> = mutableListOf()
+)
 
 data class Video(
     val id: Int,
@@ -78,12 +89,14 @@ data class LinkAttachment(val link: Link): Attachment{
 
 data class Comment(val authorId: Int,
                    val date: Int = 1012022,
-                   val text: String)
+                   val text: String,
+                   var deleted: Boolean = false)
 
 object WallService{
     private var posts = emptyArray<Post>()
-    private var comments = emptyArray<Comment>()
-    private var counter = 1;
+    private var counter = 1
+    val notes = mutableMapOf<Int,Note>()
+
 
     fun add(post: Post): Post{
         posts += post.copy(id = counter++)
@@ -99,10 +112,7 @@ object WallService{
                     return true
                 }
             }
-        if (!wasAdded) {
-            throw PostNotFoundException("No post with id: $postId")
-        }
-        return false
+        throw PostNotFoundException("No post with id: $postId")
     }
 
 
@@ -126,6 +136,63 @@ object WallService{
         posts = emptyArray()
         counter = 1
     }
+
+    fun addNote(note:Note): Int {
+        val id: Int = if (notes.isEmpty()) 1 else notes.size+1
+        notes[id] = note
+        return id
+    }
+
+    fun createCommentNote(id: Int, comment: Comment){
+        val note: Note = notes[id]!!
+        note.comments += comment
+        notes[id] = note
+    }
+
+    fun deleteNote(id: Int): Int{
+        notes.remove(id)
+        return 0
+    }
+
+    fun deleteCommentNote(id: Int, comment: Comment){
+        val note: Note = notes[id]!!
+        note.comments.remove(comment)
+        comment.deleted = true
+        note.comments += comment
+        notes[id] = note
+    }
+
+    fun editNote(note: Note){
+        notes[note.id] = note
+    }
+
+    fun editComment(id: Int, comment: Comment){
+
+    }
+
+    fun getNote(id: Int){
+        println(notes)
+    }
+
+    fun getNoteById(id: Int){
+        println(notes[id])
+    }
+
+    fun getComments(id: Int, comment: Comment){
+        val note: Note = notes[id]!!
+        /*for (i in note.comments){
+            if (!comments.deleted) println(note.comments) Если у комментария признак удаления false то выводим
+        }*/
+    }
+
+    fun restoreComment(id: Int, comment: Comment){
+        val note: Note = notes[id]!!
+        note.comments.remove(comment)
+        comment.deleted = false
+        note.comments += comment
+        notes[id] = note
+    }
+
 }
 
 fun main(){
@@ -134,17 +201,29 @@ fun main(){
     val attach1 : VideoAttachment = VideoAttachment(video1)
     val attach2 : AudioAttachment = AudioAttachment(audio1)
     val comment1 : Comment = Comment(12, text = "Nice post")
-
-    WallService.add(Post(1, 23, attachments =  arrayOf(attach1,attach2)))
+    val note1 : Note = Note(0,"title","text", 1, 1)
+    val note2 : Note = Note(0,"title2","text2", 1, 1)
+  /*  WallService.add(Post(1, 23, attachments =  arrayOf(attach1,attach2)))
     WallService.add(Post(1, 24, "Text"))
     WallService.add(Post(24, 23))
     WallService.printAll()
     println()
 
-    WallService.update(Post(1, 23, "NewText", attachments =  arrayOf(attach1)))
+    note1.id = WallService.addNote(note1)
+    note2.id = WallService.addNote(note2)
+
+    WallService.createCommentNote(1, comment1)
+    WallService.getNoteById(1)
+    WallService.deleteCommentNote(1, comment1)
+    WallService.getNoteById(1)
+    note2.id = WallService.deleteNote(note2.id)
+
+
+
+    /WallService.update(Post(1, 23, "NewText", attachments =  arrayOf(attach1)))
     WallService.printAll()
     println()
 
     WallService.createComment(4, comment1)
-    WallService.printAll()
+    WallService.printAll()*/
 }
