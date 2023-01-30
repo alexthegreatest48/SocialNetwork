@@ -175,14 +175,18 @@ object WallService{
     }
 
     fun getNoteById(id: Int){
+        val note: Note = notes[id]!!
+        for (i in note.comments) {
+            if (i.deleted) note.comments = mutableListOf()
+        }
         println(notes[id])
     }
 
-    fun getComments(id: Int, comment: Comment){
+    fun getComments(id: Int) {
         val note: Note = notes[id]!!
-        /*for (i in note.comments){
-            if (!comments.deleted) println(note.comments) Если у комментария признак удаления false то выводим
-        }*/
+        for (i in note.comments) {
+            if (!i.deleted) println(i)
+        }
     }
 
     fun restoreComment(id: Int, comment: Comment){
@@ -203,10 +207,11 @@ fun main(){
     val comment1 : Comment = Comment(12, text = "Nice post")
     val note1 : Note = Note(0,"title","text", 1, 1)
     val note2 : Note = Note(0,"title2","text2", 1, 1)
-  /*  WallService.add(Post(1, 23, attachments =  arrayOf(attach1,attach2)))
+
+    WallService.add(Post(1, 23, attachments =  arrayOf(attach1,attach2)))
     WallService.add(Post(1, 24, "Text"))
     WallService.add(Post(24, 23))
-    WallService.printAll()
+   // WallService.printAll()
     println()
 
     note1.id = WallService.addNote(note1)
@@ -215,15 +220,13 @@ fun main(){
     WallService.createCommentNote(1, comment1)
     WallService.getNoteById(1)
     WallService.deleteCommentNote(1, comment1)
+    WallService.getComments(1)
     WallService.getNoteById(1)
     note2.id = WallService.deleteNote(note2.id)
 
 
 
-    /WallService.update(Post(1, 23, "NewText", attachments =  arrayOf(attach1)))
-    WallService.printAll()
+    WallService.update(Post(1, 23, "NewText", attachments =  arrayOf(attach1)))
+    //WallService.printAll()
     println()
-
-    WallService.createComment(4, comment1)
-    WallService.printAll()*/
 }
